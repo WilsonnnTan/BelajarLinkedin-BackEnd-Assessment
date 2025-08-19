@@ -1,4 +1,4 @@
-from sqlalchemy import Column, text, BigInteger, DateTime, ForeignKey, PrimaryKeyConstraint, String, Text
+from sqlalchemy import Column, text, DateTime, ForeignKey, String
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import mapped_column
@@ -17,6 +17,8 @@ class User(Base):
     username = Column(String(50), nullable=False)
     email = Column(String(256), nullable=False)
     password = Column(String(256), nullable=False)
+    level = Column(String(10), nullable=False, server_default="user")
+    
     
 class Class(Base):
     __tablename__ = "classes"
@@ -26,10 +28,13 @@ class Class(Base):
         primary_key=True,
         server_default=text("uuid_generate_v4()")
     )
-    name = Column(String(256), nullable=False)
+    name = Column(String(256), nullable=False, unique=True)
+    detail = Column(String, nullable=True)
+    
     
 class Enrollment(Base):
     __tablename__ = "enrollments"
     
     user_id = mapped_column(ForeignKey("users.id"), primary_key=True)
     class_id = mapped_column(ForeignKey("classes.id"), primary_key=True)
+    enrolled_at = Column(DateTime(timezone=True))
