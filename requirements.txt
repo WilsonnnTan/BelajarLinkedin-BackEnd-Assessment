@@ -1,0 +1,9 @@
+python-dotenv
+asyncio
+
+sqlalchemy 
+alembic 
+asyncpg
+
+fastapi
+uvicorn
