@@ -4,6 +4,10 @@ asyncio
 sqlalchemy 
 alembic 
 asyncpg
+psycopg2
 
 fastapi
 uvicorn
+
+python-jose[cryptography]
+passlib[bcrypt]
