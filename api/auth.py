@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status, Depends
-from api_schemas.auth import UserLogin, UserRegister, Token
+from api_schemas.auth import UserRegister, Token
 from passlib.context import CryptContext
 from datetime import timedelta
 from utils.database import insert_user, get_user_by_username_or_email
