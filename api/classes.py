@@ -35,7 +35,7 @@ async def add_class(classes: AddClass ,current_user=Depends(get_current_user)):
     is_success, msg = await insert_classes(classes.name, classes.detail)
     if not is_success:
         error_exception(msg)
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT)
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail=msg)
     
     return { "message": msg }
 
