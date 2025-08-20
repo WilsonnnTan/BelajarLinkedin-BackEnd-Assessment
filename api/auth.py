@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from api_schemas.auth import UserLogin, UserRegister, Token
 from passlib.context import CryptContext
 from datetime import timedelta
 from utils.database import insert_user, get_user_by_username_or_email
 from utils.auth import create_access_token
+from fastapi.security import OAuth2PasswordRequestForm
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -20,8 +21,8 @@ async def register(user: UserRegister):
 
 # login
 @router.post("/login", response_model=Token, status_code=status.HTTP_200_OK)
-async def login(user: UserLogin):
-    dbuser, msg = await get_user_by_username_or_email(user.username_or_email)
+async def login(user: OAuth2PasswordRequestForm = Depends()):
+    dbuser, msg = await get_user_by_username_or_email(user.username)
     if not dbuser or not pwd_context.verify(user.password, dbuser.password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid Username or Password")
     
