@@ -4,7 +4,7 @@ import asyncio
 from dotenv import load_dotenv
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.future import select
-from sqlalchemy import text, and_, delete
+from sqlalchemy import text, and_, delete, or_
 from sqlalchemy.orm import sessionmaker
 from typing import Optional, List, Tuple
 from datetime import timedelta, timezone, datetime
@@ -50,7 +50,7 @@ async def get_user_by_id(id: uuid.UUID) -> Tuple[Optional[User], str]:
 async def get_user_by_username_or_email(username_or_email: str) -> Tuple[Optional[User], str]:
     try:
         async with AsyncSessionLocal() as session:
-            stmt = select(User).where(User.username==username_or_email | User.email==username_or_email)
+            stmt = select(User).where(or_(User.username==username_or_email, User.email==username_or_email))
             result = await session.scalars(stmt)
             user = result.one_or_none()
             
@@ -65,11 +65,11 @@ async def get_user_by_username_or_email(username_or_email: str) -> Tuple[Optiona
 async def insert_user(username: str, email: str, password: str) -> Tuple[bool, str]:
     try:
         async with AsyncSessionLocal() as session:
-            stmt = select(User).where(User.name==username | User.email==email)
+            stmt = select(User).where(or_(User.username==username, User.email==email))
             result = await session.scalars(stmt)
             user = result.one_or_none()            
             
-            if not user:
+            if user:
                 return False, "Username or Email already exist!"
             
             new_user = User(username=username, email=email, password=password)
