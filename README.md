@@ -28,3 +28,15 @@ Some endpoints require authentication using **OAuth2 password flow (Bearer token
 2. In the modal, enter your username and login
 3. Click **Authorize** and close the modal.  
 4. All authorized endpoints will now include your token automatically.
+
+## 3. Admin-Only Endpoints
+
+Some routes require **admin privileges** to access.  
+
+- The default admin account is:
+```
+    username: admin
+    password: admin
+```
+- Only users with `level="admin"` can perform actions like **adding, editing, or deleting classes**.  
+- Attempting to access admin-only routes with a non-admin account will return a **403 Forbidden** error.
