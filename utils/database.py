@@ -154,11 +154,11 @@ async def delete_classes_by_id(id: uuid.UUID) -> Tuple[bool, str]:
             result = await session.execute(stmt)
             await session.commit()
             
-            if result.rowcount == 0:
+            if result.rowcount is None or result.rowcount == 0:
                 return False, "No classes found"
         return True, "Delete success"
     except Exception as e:
-        return False,f"Error update classes: {e}"
+        return False,f"Error delete classes: {e}"
     
 # ----------------- Enrollment Table ---------------------------
 async def get_enrollment_by_user_id(user_id: uuid.UUID) -> Tuple[List[Enrollment], str]:
@@ -178,7 +178,7 @@ async def get_enrollment_by_user_id(user_id: uuid.UUID) -> Tuple[List[Enrollment
 async def enroll_user(user_id: uuid.UUID, class_id: uuid.UUID) -> Tuple[bool, str]:
     try:
         async with AsyncSessionLocal() as session:
-            stmt = select(Enrollment).where(Enrollment.user_id==id & Enrollment.class_id==class_id)
+            stmt = select(Enrollment).where(and_(Enrollment.user_id==user_id, Enrollment.class_id==class_id))
             result = await session.scalars(stmt)
             enrollment = result.one_or_none() 
             
