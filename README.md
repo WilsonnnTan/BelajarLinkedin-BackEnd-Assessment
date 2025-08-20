@@ -10,7 +10,7 @@ This guide explains how to use the deployed API through **Swagger UI**, how to a
 
 Open your browser and go to the deployed Swagger UI link:
 ```
-    
+    https://belajarlinkedin-backend-assessment-production.up.railway.app
 ```
 
 - You will see an interactive interface listing all available endpoints.
