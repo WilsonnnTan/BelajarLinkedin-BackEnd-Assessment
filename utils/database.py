@@ -47,21 +47,6 @@ async def get_user_by_id(id: uuid.UUID) -> Tuple[Optional[User], str]:
         return None, f"Error fetching user: {e}"
     
     
-async def get_user_by_id(id: uuid.UUID) -> Tuple[Optional[User], str]:
-    try:
-        async with AsyncSessionLocal() as session:
-            stmt = select(User).where(User.id==id)
-            result = await session.scalars(stmt)
-            user = result.one_or_none()
-            
-            if user:
-                return user, "User found"
-            
-            return None, "User not found"
-    except Exception as e:
-        return None, f"Error fetching user: {e}"
-    
-    
 async def get_user_by_username_or_email(username_or_email: str) -> Tuple[Optional[User], str]:
     try:
         async with AsyncSessionLocal() as session:
@@ -92,7 +77,7 @@ async def insert_user(username: str, email: str, password: str) -> Tuple[bool, s
             await session.commit()
         return True, "User registered successfully"
     except Exception as e:
-        return False, f"Unexpected error: {e}"
+        return False, f"Error insert user: {e}"
             
 # ----------------- Class Table ---------------------------
 async def get_all_classes() -> Tuple[List[Class], str]:
@@ -130,7 +115,7 @@ async def insert_classes(name: str, detail: str = None) -> Tuple[bool, str]:
             result = await session.scalars(stmt)
             classes = result.one_or_none() 
             
-            if not classes:
+            if classes:
                 return False, "Class name already exists!"
             
             new_class = Class(name=name, detail=detail)
@@ -138,7 +123,7 @@ async def insert_classes(name: str, detail: str = None) -> Tuple[bool, str]:
             await session.commit()
         return True, "Class added successfully"
     except Exception as e:
-        return False, f"Unexpected error: {e}"
+        return False, f"Error insert class: {e}"
 
 
 async def update_classes_by_id(id: uuid.UUID, name: str = None, detail: str = None) -> Tuple[bool, str]:
@@ -173,4 +158,36 @@ async def delete_classes_by_id(id: uuid.UUID) -> Tuple[bool, str]:
                 return False, "No classes found"
         return True, "Delete success"
     except Exception as e:
-        return False,"Error update classes: {e}"
+        return False,f"Error update classes: {e}"
+    
+# ----------------- Enrollment Table ---------------------------
+async def get_enrollment_by_user_id(user_id: uuid.UUID) -> Tuple[List[Enrollment], str]:
+    try:
+        async with AsyncSessionLocal() as session:
+            stmt = select(Enrollment).where(Enrollment.user_id==user_id)
+            result = await session.scalars(stmt)
+            enrollment = result.all()
+            
+        if not enrollment:
+            return enrollment, "No Enrollment Found"
+        return enrollment, "Enrollment retrieved successfully"
+    except Exception as e:
+        return [], f"Error fetch enrollment: {e}"
+    
+
+async def enroll_user(user_id: uuid.UUID, class_id: uuid.UUID) -> Tuple[bool, str]:
+    try:
+        async with AsyncSessionLocal() as session:
+            stmt = select(Enrollment).where(Enrollment.user_id==id & Enrollment.class_id==class_id)
+            result = await session.scalars(stmt)
+            enrollment = result.one_or_none() 
+            
+            if enrollment:
+                return False, "User Already Enrolled!"
+            
+            new_enrollment = Enrollment(user_id=user_id, class_id=class_id)
+            session.add(new_enrollment)
+            await session.commit()
+        return True, "Class Enrolled Successfully"
+    except Exception as e:
+        return False, f"Error enrolling: {e}"
